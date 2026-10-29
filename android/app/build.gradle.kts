@@ -63,7 +63,17 @@ android {
     assetPacks += mutableSetOf(":qnn_pack", ":sd_pack")
 
     buildTypes {
+        getByName("debug") {
+            // An opt-in, local-only personal test build can coexist with the Play Store app.
+            // This does not change normal debug builds or production package identity.
+            if (project.providers.gradleProperty("personalDebugBuild").orNull == "true") {
+                applicationIdSuffix = ".personal"
+                versionNameSuffix = "-personal"
+            }
+        }
         release {
+            // The documented DEBUG_PREMIUM developer override must never ship in release.
+            buildConfigField("Boolean", "DEBUG_PREMIUM", "false")
             // Enable R8 code shrinking and obfuscation to meet Google Play's 25% threshold
             isMinifyEnabled = true
             isShrinkResources = true
