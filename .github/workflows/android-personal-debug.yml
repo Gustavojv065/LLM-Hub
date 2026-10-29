@@ -29,8 +29,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # GitHub's Ubuntu Android runner already supplies ANDROID_HOME and sdkmanager.
+      # Avoid setup-android@v3, which attempts to install the obsolete 'tools' package.
 
       - name: Install Android SDK / native tools
         run: |
