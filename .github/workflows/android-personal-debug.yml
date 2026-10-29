@@ -1,0 +1,71 @@
+name: Android APK pessoal (somente debug)
+
+on:
+  pull_request:
+    paths:
+      - 'android/app/build.gradle.kts'
+      - '.github/workflows/android-personal-debug.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-personal-debug:
+    # A personal test build; do not run for untrusted forks.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # GitHub's Ubuntu Android runner already supplies ANDROID_HOME and sdkmanager.
+      # Avoid setup-android@v3, which attempts to install the obsolete 'tools' package.
+
+      - name: Install Android SDK / native tools
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "Could not find sdkmanager in $SDK_ROOT/cmdline-tools"
+            exit 1
+          fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platforms;android-37.0" "build-tools;37.0.0" "ndk;29.0.13113456" "cmake;3.31.6"
+          # API 37.0 is published with a minor-version folder, but some AGP tools
+          # still resolve compileSdk=37 through the plain android-37 hash.
+          if [ -d "$SDK_ROOT/platforms/android-37.0" ] && [ ! -e "$SDK_ROOT/platforms/android-37" ]; then
+            ln -s "$SDK_ROOT/platforms/android-37.0" "$SDK_ROOT/platforms/android-37"
+          fi
+
+      - name: Enable developer premium for this local-test build
+        run: |
+          # LLM Hub documents DEBUG_PREMIUM for local development only.
+          # local.properties is ignored by Git and never uploaded.
+          printf '%s\n' 'DEBUG_PREMIUM=true' > android/local.properties
+
+      - name: Compile personal Android debug APK (ARM64)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug -PpersonalDebugBuild=true --no-daemon --stacktrace
+
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LLM-Hub-Pessoal-Debug-ARM64
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 1
