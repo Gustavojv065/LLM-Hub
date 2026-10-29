@@ -34,7 +34,16 @@ jobs:
 
       - name: Install Android SDK / native tools
         run: |
-          sdkmanager --install "platforms;android-37" "build-tools;37.0.0" "ndk;29.0.13113456" "cmake;3.31.6"
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "Could not find sdkmanager in $SDK_ROOT/cmdline-tools"
+            exit 1
+          fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platforms;android-37" "build-tools;37.0.0" "ndk;29.0.13113456" "cmake;3.31.6"
 
       - name: Enable developer premium for this local-test build
         run: |
