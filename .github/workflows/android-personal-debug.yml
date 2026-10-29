@@ -43,7 +43,12 @@ jobs:
           echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platforms;android-37" "build-tools;37.0.0" "ndk;29.0.13113456" "cmake;3.31.6"
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platforms;android-37.0" "build-tools;37.0.0" "ndk;29.0.13113456" "cmake;3.31.6"
+          # API 37.0 is published with a minor-version folder, but some AGP tools
+          # still resolve compileSdk=37 through the plain android-37 hash.
+          if [ -d "$SDK_ROOT/platforms/android-37.0" ] && [ ! -e "$SDK_ROOT/platforms/android-37" ]; then
+            ln -s "$SDK_ROOT/platforms/android-37.0" "$SDK_ROOT/platforms/android-37"
+          fi
 
       - name: Enable developer premium for this local-test build
         run: |
