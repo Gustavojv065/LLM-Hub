@@ -43,6 +43,7 @@ sealed class Screen(val route: String) {
         fun createRoute(codeContent: String, codeType: String = "html") =
             "code_canvas?code=${android.net.Uri.encode(codeContent)}&type=$codeType"
     }
+    object HybridChat : Screen("hybrid_chat")
     object Settings : Screen("settings")
     object Models : Screen("models")
     object About : Screen("about")
@@ -99,6 +100,7 @@ fun LlmHubNavigation(
                 onNavigateToFeature = { route ->
                     when (route) {
                         "chat" -> navController.navigate(Screen.Chat.createRoute("new"))
+                        "hybrid_chat" -> navController.navigate(Screen.HybridChat.route)
                         "writing_aid" -> navController.navigate(Screen.WritingAid.route)
                         "translator" -> navController.navigate(Screen.Translator.route)
                         "transcriber" -> navController.navigate(Screen.Transcriber.route)
@@ -265,6 +267,13 @@ fun LlmHubNavigation(
             )
         }
         
+        composable(Screen.HybridChat.route) {
+            HybridChatScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToOfflineChat = { navController.navigate(Screen.Chat.createRoute("new")) }
+            )
+        }
+
         composable(Screen.Settings.route) {
             SettingsScreen(
                 onNavigateBack = {
@@ -272,6 +281,9 @@ fun LlmHubNavigation(
                 },
                 onNavigateToModels = {
                     navController.navigate(Screen.Models.route)
+                },
+                onNavigateToHybridChat = {
+                    navController.navigate(Screen.HybridChat.route)
                 },
                 onNavigateToAbout = {
                     navController.navigate(Screen.About.route)
