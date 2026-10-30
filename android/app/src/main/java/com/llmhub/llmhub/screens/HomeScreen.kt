@@ -85,6 +85,14 @@ fun HomeScreen(
                 route = "chat"
             ),
             FeatureCard(
+                title = R.string.hybrid_chat_title,
+                description = R.string.hybrid_chat_desc,
+                icon = Icons.Filled.Cloud,
+                gradient = Pair(Color(0xFF335CC5), Color(0xFF00A6A6)),
+                darkColor = Color(0xFF1B365F),
+                route = "hybrid_chat"
+            ),
+            FeatureCard(
                 title = R.string.feature_writing_aid,
                 description = R.string.feature_writing_aid_desc,
                 icon = Icons.Filled.Edit,
