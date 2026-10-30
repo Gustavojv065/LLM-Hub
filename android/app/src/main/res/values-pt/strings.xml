@@ -960,4 +960,7 @@
     <string name="gguf_vulkan_setting">Backend GPU de GGUF</string>
     <string name="crash_recovery_title">O app fechou inesperadamente</string>
     <string name="crash_recovery_message">Tente carregar um modelo menor ou usar a CPU.</string>
+    <string name="hybrid_chat_title">Assistente híbrido · Online</string>
+    <string name="hybrid_chat_desc">Use OpenAI, NVIDIA ou OpenRouter quando quiser</string>
+    <string name="hybrid_chat_settings_desc">Configure provedor e chave de API protegida</string>
 </resources>

@@ -1022,4 +1022,7 @@
     <string name="gguf_vulkan_setting">GGUF GPU backend</string>
     <string name="crash_recovery_title">App closed unexpectedly</string>
     <string name="crash_recovery_message">Try loading a smaller model or using CPU.</string>
+    <string name="hybrid_chat_title">Hybrid AI · Online</string>
+    <string name="hybrid_chat_desc">Choose OpenAI, NVIDIA or OpenRouter and chat online</string>
+    <string name="hybrid_chat_settings_desc">Configure your online AI provider and encrypted API key</string>
 </resources>

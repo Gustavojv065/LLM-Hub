@@ -67,6 +67,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToModels: () -> Unit,
+    onNavigateToHybridChat: () -> Unit,
     onNavigateToAbout: () -> Unit,
     onNavigateToTerms: () -> Unit,
     onNavigateToPremium: () -> Unit = {},
@@ -126,6 +127,13 @@ fun SettingsScreen(
                         title = stringResource(R.string.download_models),
                         subtitle = stringResource(R.string.browse_download_models),
                         onClick = onNavigateToModels
+                    )
+
+                    SettingsItem(
+                        icon = Icons.Default.Cloud,
+                        title = stringResource(R.string.hybrid_chat_title),
+                        subtitle = stringResource(R.string.hybrid_chat_settings_desc),
+                        onClick = onNavigateToHybridChat
                     )
 
                     SettingsItem(
