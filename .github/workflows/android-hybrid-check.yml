@@ -41,11 +41,16 @@ jobs:
             ln -s "$SDK_ROOT/platforms/android-37.0" "$SDK_ROOT/platforms/android-37"
           fi
 
+      - name: Enable documented premium developer mode for this test APK
+        run: |
+          # Local-only opt-in. Never commit the token file or ship this in release.
+          printf '%s\n' 'DEBUG_PREMIUM=true' > android/local.properties
+
       - name: Kotlin unit tests and Android debug build
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon --stacktrace
+          ./gradlew :app:testDebugUnitTest :app:assembleDebug -PpersonalHybridBuild=true --no-daemon --stacktrace
 
       - name: Upload test APK only after success
         uses: actions/upload-artifact@v4
