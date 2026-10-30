@@ -7,7 +7,7 @@ import org.junit.Test
 class GeniexPromptTest {
     @Test
     fun simpleUserPromptRemainsSimple() {
-        assertEquals("Hello", prepareVlmUserText("user: Hello\nassistant:"))
+        assertEquals(listOf(VlmPromptTurn("user", "Hello")), parseVlmPromptTurns("user: Hello\nassistant:"))
     }
 
     @Test
@@ -26,7 +26,10 @@ class GeniexPromptTest {
             assistant:
         """.trimIndent()
 
-        val result = prepareVlmUserText(prompt)
+        val turns = parseVlmPromptTurns(prompt)
+        assertEquals(1, turns.size)
+        assertEquals("user", turns.single().role)
+        val result = turns.single().text
 
         assertTrue(result.startsWith("What is my favourite colour?"))
         assertTrue(result.contains("USER MEMORY FACTS:"))
@@ -47,11 +50,12 @@ class GeniexPromptTest {
             assistant:
         """.trimIndent()
 
-        val result = prepareVlmUserText(prompt)
+        val turns = parseVlmPromptTurns(prompt)
 
-        assertTrue(result.startsWith("system: Be concise."))
-        assertTrue(result.contains("assistant: Nice to meet you."))
-        assertTrue(result.contains("user: What is my name?"))
+        assertEquals(listOf("system", "user", "assistant", "user"), turns.map { it.role })
+        assertEquals("Be concise.", turns[0].text)
+        assertEquals("Nice to meet you.", turns[2].text)
+        assertEquals("What is my name?", turns[3].text)
     }
 
     @Test
