@@ -30,7 +30,7 @@ object CodeBlockParser {
                         result.add(CodeBlock(lang, content, isInline = false))
                     }
                     is Code -> {
-                        val literal = child.chars?.toString() ?: ""
+                        val literal = child.text.toString()
                         result.add(CodeBlock(null, literal, isInline = true))
                     }
                 }
