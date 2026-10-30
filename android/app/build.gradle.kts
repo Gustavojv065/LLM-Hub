@@ -63,7 +63,16 @@ android {
     assetPacks += mutableSetOf(":qnn_pack", ":sd_pack")
 
     buildTypes {
+        getByName("debug") {
+            // Opt-in personal testing only; normal debug/release behavior is unchanged.
+            if (project.providers.gradleProperty("personalHybridBuild").orNull == "true") {
+                applicationIdSuffix = ".hybrid"
+                versionNameSuffix = "-hybrid"
+            }
+        }
         release {
+            // The local-only developer entitlement must never enter a release build.
+            buildConfigField("Boolean", "DEBUG_PREMIUM", "false")
             // Enable R8 code shrinking and obfuscation to meet Google Play's 25% threshold
             isMinifyEnabled = true
             isShrinkResources = true
